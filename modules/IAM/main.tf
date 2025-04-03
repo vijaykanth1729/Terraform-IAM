@@ -1,6 +1,10 @@
 # creating IAM user
 resource "aws_iam_user" "test" {
   name = "test"
+  lifecycle {
+    ignore_changes = [name]
+  }
+
 }
 
 # creating IAM Group
@@ -22,6 +26,10 @@ resource "aws_iam_user_group_membership" "test_group_membership" {
 # creating s3 bucket
 resource "aws_s3_bucket" "sample_bucket" {
   bucket = "my-sample-test.007"
+  lifecycle {
+    ignore_changes = [bucket]
+  }
+
 }
 
 # creating a policy document in json, it can be added to a policy later
