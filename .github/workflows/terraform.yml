@@ -50,7 +50,7 @@ jobs:
     name: 'Terraform Destroy'
     runs-on: ubuntu-latest
     environment: production
-    if: github.event_name == 'workflow_dispatch'  # Only runs manually
+    if: github.event_name == 'workflow_dispatch'  # Only runs when manually triggered
 
     steps:
     - name: Checkout Repository
@@ -69,5 +69,20 @@ jobs:
     - name: Terraform Init
       run: terraform init
 
+    - name: Terraform Validate
+      run: terraform validate
+
+    - name: Check Existing Resources
+      id: check_state
+      run: |
+        if terraform state list | grep .; then
+          echo "Resources exist, proceeding with destroy..."
+          echo "destroy=true" >> $GITHUB_ENV
+        else
+          echo "No resources found. Skipping destroy."
+          echo "destroy=false" >> $GITHUB_ENV
+        fi
+
     - name: Terraform Destroy
+      if: env.destroy == 'true'
       run: terraform destroy -auto-approve -input=false
