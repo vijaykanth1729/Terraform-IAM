@@ -1,9 +1,17 @@
+name: Terraform CI/CD
+
+on:
+  push:
+    branches:
+      - main  # Runs on push to main branch
+  workflow_dispatch:  # Allows manual trigger
+
 jobs:
   terraform-destroy:
     name: 'Terraform Destroy'
     runs-on: ubuntu-latest
     environment: production
-    if: github.event_name == 'workflow_dispatch'  # Manual trigger only
+    if: github.event_name == 'workflow_dispatch'  # Only for manual trigger
 
     steps:
     - name: Checkout Repository
@@ -30,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     needs: terraform-destroy
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: success() && (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
 
     steps:
     - name: Checkout Repository
